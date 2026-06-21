@@ -1,4 +1,5 @@
 import React, { Suspense, lazy } from 'react';
+import PropTypes from 'prop-types';
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import { LayoutDashboard, Zap, ShieldAlert, Leaf, LogOut, Moon, Sun, Wallet, Calculator, ShoppingCart, Gamepad2, Coins, Home, PieChart, Loader } from 'lucide-react';
@@ -31,6 +32,14 @@ const NavButton = ({ view, icon: Icon, label, currentView, setCurrentView }) => 
   );
 };
 
+NavButton.propTypes = {
+  view: PropTypes.string.isRequired,
+  icon: PropTypes.elementType.isRequired,
+  label: PropTypes.string.isRequired,
+  currentView: PropTypes.string.isRequired,
+  setCurrentView: PropTypes.func.isRequired,
+};
+
 const MobileNavButton = ({ view, icon: Icon, label, currentView, setCurrentView }) => {
   const isActive = currentView === view;
   return (
@@ -45,6 +54,14 @@ const MobileNavButton = ({ view, icon: Icon, label, currentView, setCurrentView 
       <span className="text-[10px] font-medium tracking-tight">{label}</span>
     </button>
   );
+};
+
+MobileNavButton.propTypes = {
+  view: PropTypes.string.isRequired,
+  icon: PropTypes.elementType.isRequired,
+  label: PropTypes.string.isRequired,
+  currentView: PropTypes.string.isRequired,
+  setCurrentView: PropTypes.func.isRequired,
 };
 
 function App() {

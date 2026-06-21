@@ -126,7 +126,9 @@ const Dashboard = () => {
           <div className="p-2 bg-primary/20 text-primary-dark rounded-xl shadow-inner" aria-hidden="true">
             <Activity size={24} />
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight m-0 text-gradient">Carbon Footprint Awareness Dashboard</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight m-0 text-gradient">
+            {userData.name ? `${userData.name}'s Dashboard` : 'Carbon Footprint Dashboard'}
+          </h2>
         </div>
         <motion.button 
           whileHover={{ scale: 1.05 }}

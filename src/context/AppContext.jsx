@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useMemo, useContext, useCallback } from 'react';
 import { loadUserData, saveUserData, clearUserData } from '../utils/storage';
 

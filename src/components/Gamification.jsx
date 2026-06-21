@@ -86,7 +86,17 @@ const Gamification = ({ userData }) => {
                   triggerConfetti();
                 }
               }}
-              className={`relative overflow-hidden cursor-pointer group card border transition-all duration-300 ${isUnlocked ? 'border-gray-200 dark:border-zinc-800 shadow-lg hover:border-primary/50' : 'border-gray-100 dark:border-zinc-800/50 bg-gray-50 dark:bg-zinc-900/50 opacity-75'}`}
+              className={`relative overflow-hidden cursor-pointer group card border transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary ${isUnlocked ? 'border-gray-200 dark:border-zinc-800 shadow-lg hover:border-primary/50' : 'border-gray-100 dark:border-zinc-800/50 bg-gray-50 dark:bg-zinc-900/50 opacity-75'}`}
+              tabIndex={0}
+              role="button"
+              aria-label={isUnlocked ? `Inspect ${badge.title} badge` : `Locked badge: ${badge.title}`}
+              onKeyDown={(e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && isUnlocked) {
+                  e.preventDefault();
+                  setSelectedBadge(badge);
+                  triggerConfetti();
+                }
+              }}
             >
               {/* Pedestal Top/Glow for unlocked */}
               {isUnlocked && (

@@ -10,7 +10,7 @@ vi.mock('../context/AppContext', () => ({
 }));
 
 describe('ActionCenter Component', () => {
-  it('renders Action Center and filters correctly', () => {
+  it('renders Action Center and filters correctly', async () => {
     const handleUpdateScoreMock = vi.fn();
     
     AppContextModule.useAppContext.mockReturnValue({
@@ -27,14 +27,15 @@ describe('ActionCenter Component', () => {
     expect(screen.getByText('Meatless Day')).toBeTruthy();
     
     // Filter by Diet
-    const dietButton = screen.getByText('Diet');
+    const dietButton = screen.getByRole('button', { name: 'Diet' });
     fireEvent.click(dietButton);
     
     // Meatless Day should still be there
     expect(screen.getByText('Meatless Day')).toBeTruthy();
     
-    // LED Bulbs (Energy) should NOT be there
-    expect(screen.queryByText('LED Bulbs')).toBeNull();
+    // LED Bulbs (Energy) should NOT be there (wait for animation)
+    const { waitFor } = await import('@testing-library/react');
+    await waitFor(() => expect(screen.queryByText('LED Bulbs')).toBeNull());
   });
 
   it('calls handleUpdateScore when an action is clicked', () => {
