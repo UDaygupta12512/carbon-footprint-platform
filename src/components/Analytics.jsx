@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { PieChart as PieChartIcon, TrendingDown, Activity, Info } from 'lucide-react';
 import { 
   PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, AreaChart, Area
+  BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts';
 
 const COLORS = ['#3b82f6', '#22c55e', '#eab308', '#ec4899'];
@@ -41,7 +41,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const Analytics = ({ userData }) => {
+const Analytics = () => {
   // If we had real historical data, we'd process userData here.
   // We're using realistic mock data to demonstrate the visual layout.
   

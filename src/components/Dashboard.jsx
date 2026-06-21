@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { Activity, Globe, Target, Award, Share2 } from 'lucide-react';
+import { Activity, Globe, Target, Award, Share2, Lightbulb } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 
 const AnimatedNumber = ({ value }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -49,7 +50,8 @@ const TiltCard = ({ children, className }) => {
   );
 };
 
-const Dashboard = ({ userData }) => {
+const Dashboard = () => {
+  const { userData } = useAppContext();
   const avgScore = 100;
   
   const transportScore = 30;
@@ -61,6 +63,21 @@ const Dashboard = ({ userData }) => {
     { name: 'Diet', value: dietScore, color: '#10b981' }, // emerald
     { name: 'Energy', value: energyScore, color: '#f59e0b' }, // amber
   ];
+
+  const getSmartInsight = () => {
+    const highestEmission = breakdownData.reduce((prev, current) => (prev.value > current.value) ? prev : current);
+    
+    switch(highestEmission.name) {
+      case 'Transport':
+        return "Your transport emissions are highest. Consider carpooling or taking public transit twice this week to see a drop!";
+      case 'Diet':
+        return "Diet is your biggest footprint. Trying a meatless day could significantly reduce this segment.";
+      case 'Energy':
+        return "Energy use is peaking. Ensure appliances are off when not in use and consider switching to LED bulbs.";
+      default:
+        return "You're doing great! Keep tracking your habits.";
+    }
+  };
 
   // Simulated history data converging on current score
   const historyData = [
@@ -106,18 +123,19 @@ const Dashboard = ({ userData }) => {
     >
       <div className="flex items-center justify-between mb-8 relative z-10">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/20 text-primary-dark rounded-xl shadow-inner">
+          <div className="p-2 bg-primary/20 text-primary-dark rounded-xl shadow-inner" aria-hidden="true">
             <Activity size={24} />
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight m-0 text-gradient">Your Dashboard</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight m-0 text-gradient">Carbon Footprint Awareness Dashboard</h2>
         </div>
         <motion.button 
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleShare}
           className="btn btn-outline py-2.5 px-5 text-sm flex items-center gap-2 rounded-xl shadow-sm"
+          aria-label="Share Score"
         >
-          <Share2 size={16} /> <span className="hidden sm:inline font-bold">Share Score</span>
+          <Share2 size={16} aria-hidden="true" /> <span className="hidden sm:inline font-bold">Share Score</span>
         </motion.button>
       </div>
 
@@ -126,8 +144,13 @@ const Dashboard = ({ userData }) => {
           <TiltCard className="p-8 card text-center flex-1 flex flex-col justify-center items-center relative overflow-hidden">
             <h3 className="text-sm uppercase tracking-widest opacity-70 mb-6 font-bold z-10">Carbon Footprint</h3>
             
+            {/* Visually hidden screen reader text */}
+            <div className="sr-only" aria-live="polite">
+              Your current carbon footprint score is {userData.currentScore} points. {getStatusText()}
+            </div>
+
             {/* Animated SVG Progress Ring */}
-            <div className="relative w-48 h-48 flex flex-col items-center justify-center z-10">
+            <div className="relative w-48 h-48 flex flex-col items-center justify-center z-10" aria-hidden="true">
               <svg className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-md" viewBox="0 0 200 200">
                 {/* Background Ring */}
                 <circle 
@@ -149,26 +172,39 @@ const Dashboard = ({ userData }) => {
               <div className="text-xs font-bold uppercase opacity-60 tracking-widest mt-1">Points</div>
             </div>
 
-            <p className="font-bold text-sm mt-6 z-10" style={{ color: 'var(--color-text)', opacity: 0.8 }}>{getStatusText()}</p>
+            <p className="font-bold text-sm mt-6 z-10" style={{ color: 'var(--color-text)', opacity: 0.8 }} aria-hidden="true">{getStatusText()}</p>
           </TiltCard>
           
           <div className="grid grid-cols-2 gap-6 h-36">
             <TiltCard className="p-4 card flex flex-col items-center justify-center relative overflow-hidden" style={{ borderRadius: '16px' }}>
-              <div className="absolute top-0 right-0 p-4 opacity-5"><Globe size={64} /></div>
-              <Globe className="text-blue-500 mb-2 relative z-10" size={28} />
+              <div className="absolute top-0 right-0 p-4 opacity-5" aria-hidden="true"><Globe size={64} /></div>
+              <Globe className="text-blue-500 mb-2 relative z-10" size={28} aria-hidden="true" />
               <span className="text-sm opacity-80 text-center font-bold relative z-10">Avg: {avgScore}</span>
+              <span className="sr-only">The average score is {avgScore}.</span>
             </TiltCard>
             <TiltCard className="p-4 card flex flex-col items-center justify-center relative overflow-hidden" style={{ borderRadius: '16px' }}>
-              <div className="absolute top-0 right-0 p-4 opacity-5"><Target size={64} /></div>
-              <Target className="text-red-500 mb-2 relative z-10" size={28} />
+              <div className="absolute top-0 right-0 p-4 opacity-5" aria-hidden="true"><Target size={64} /></div>
+              <Target className="text-red-500 mb-2 relative z-10" size={28} aria-hidden="true" />
               <span className="text-sm opacity-80 text-center font-bold relative z-10">Target: &lt;60</span>
+              <span className="sr-only">Your target score should be less than 60.</span>
             </TiltCard>
           </div>
         </div>
 
         <TiltCard className="flex-1 card p-8 flex flex-col items-center min-h-[350px] relative z-10">
           <h3 className="text-sm uppercase tracking-widest font-bold mb-6 opacity-70">Emission Breakdown</h3>
-          <div className="w-full flex-1 h-full min-h-[220px]">
+          
+          {/* Smart Insight Banner */}
+          <div className="w-full bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 p-4 rounded-xl mb-4 flex items-start gap-3">
+             <Lightbulb className="text-blue-500 flex-shrink-0 mt-0.5" size={18} />
+             <p className="text-sm font-semibold text-blue-800 dark:text-blue-300 m-0">{getSmartInsight()}</p>
+          </div>
+
+          <div className="sr-only">
+             Emission Breakdown: {breakdownData.map(item => `${item.name}: ${item.value} points`).join(', ')}.
+          </div>
+
+          <div className="w-full flex-1 h-full min-h-[220px]" aria-hidden="true">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -189,7 +225,7 @@ const Dashboard = ({ userData }) => {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex gap-6 mt-6">
+          <div className="flex gap-6 mt-6" aria-hidden="true">
             {breakdownData.map(item => (
               <div key={item.name} className="flex items-center gap-2 text-sm font-bold opacity-80">
                 <div className="w-4 h-4 rounded-full shadow-inner" style={{ backgroundColor: item.color }}></div>
@@ -204,7 +240,8 @@ const Dashboard = ({ userData }) => {
         {/* Progress History Chart */}
         <div className="lg:col-span-2 p-8 card">
           <h3 className="text-sm uppercase tracking-widest font-bold mb-8 opacity-70">6-Month Trend</h3>
-          <div className="w-full h-[250px]">
+          <div className="sr-only">Your score over the last 6 months has trended downwards towards {userData.currentScore}.</div>
+          <div className="w-full h-[250px]" aria-hidden="true">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={historyData} margin={{ top: 5, right: 20, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(150,150,150,0.15)" />
@@ -228,9 +265,9 @@ const Dashboard = ({ userData }) => {
         {/* Community Leaderboard */}
         <div className="p-8 card flex flex-col">
           <h3 className="text-sm uppercase tracking-widest font-bold mb-6 opacity-70 flex items-center gap-2 m-0">
-            <Award className="text-yellow-500" size={18} /> Global Rank
+            <Award className="text-yellow-500" size={18} aria-hidden="true" /> Global Rank
           </h3>
-          <div className="space-y-3 flex-1">
+          <div className="space-y-3 flex-1" aria-label="Leaderboard">
             {[
               { name: 'Sarah J.', score: 45, isUser: false },
               { name: 'You', score: userData.currentScore, isUser: true },
@@ -243,12 +280,13 @@ const Dashboard = ({ userData }) => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 + (idx * 0.1) }}
                 className={`flex justify-between items-center p-4 rounded-xl transition-all hover:-translate-y-1 ${person.isUser ? 'bg-primary text-white font-bold shadow-md' : 'card hover:shadow-md border border-gray-100 dark:border-zinc-800'}`}
+                aria-label={`Rank ${idx + 1}, ${person.name}, Score ${person.score}`}
               >
                 <div className="flex items-center gap-4">
-                  <span className="opacity-50 font-mono w-5 text-right text-sm">{idx + 1}</span>
+                  <span className="opacity-50 font-mono w-5 text-right text-sm" aria-hidden="true">{idx + 1}</span>
                   <span className="font-bold">{person.name}</span>
                 </div>
-                <span className={`font-black tracking-tight ${person.isUser ? '' : 'opacity-70'}`}><AnimatedNumber value={person.score} /></span>
+                <span className={`font-black tracking-tight ${person.isUser ? '' : 'opacity-70'}`} aria-hidden="true"><AnimatedNumber value={person.score} /></span>
               </motion.div>
             ))}
           </div>

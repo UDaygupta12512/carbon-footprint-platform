@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Leaf, Check, Plus, Bike, Zap, Apple } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAppContext } from '../context/AppContext';
 
 const actionsList = [
   { id: 1, title: 'Meatless Day', points: -50, category: 'Diet', icon: Apple },
@@ -12,7 +13,8 @@ const actionsList = [
   { id: 6, title: 'LED Bulbs', points: -10, category: 'Energy', icon: Zap },
 ];
 
-const ActionCenter = ({ userData, onUpdate }) => {
+const ActionCenter = () => {
+  const { userData, handleUpdateScore } = useAppContext();
   const [completedActions, setCompletedActions] = useState(userData.actions || []);
   const [filter, setFilter] = useState('All');
 
@@ -22,7 +24,7 @@ const ActionCenter = ({ userData, onUpdate }) => {
     const newActions = [...completedActions, action.id];
     setCompletedActions(newActions);
     const newScore = userData.currentScore + action.points;
-    onUpdate(newScore, newActions);
+    handleUpdateScore(newScore, newActions);
     
     // Add micro-interaction feedback
     toast.success(`Quest Completed: ${action.title}!`, {
@@ -32,9 +34,13 @@ const ActionCenter = ({ userData, onUpdate }) => {
 
   const categories = ['All', 'Diet', 'Transport', 'Energy'];
   
-  const filteredActions = actionsList.filter(a => filter === 'All' || a.category === filter);
-  const activeActions = filteredActions.filter(a => !completedActions.includes(a.id));
-  const finishedActions = filteredActions.filter(a => completedActions.includes(a.id));
+  const { activeActions, finishedActions } = useMemo(() => {
+    const filtered = actionsList.filter(a => filter === 'All' || a.category === filter);
+    return {
+      activeActions: filtered.filter(a => !completedActions.includes(a.id)),
+      finishedActions: filtered.filter(a => completedActions.includes(a.id))
+    };
+  }, [filter, completedActions]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="card p-6 md:p-8">
@@ -61,16 +67,16 @@ const ActionCenter = ({ userData, onUpdate }) => {
           {activeActions.map(action => {
             const Icon = action.icon;
             return (
-              <motion.div 
+              <motion.button 
                 key={action.id}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="flex items-center justify-between p-4 card hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer group border border-gray-200 dark:border-zinc-800"
+                className="w-full flex items-center justify-between p-4 card hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer group border border-gray-200 dark:border-zinc-800"
                 onClick={() => handleAction(action)}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 text-left">
                   <div className="p-2 bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light rounded-xl">
                     <Icon size={20} />
                   </div>
@@ -85,7 +91,7 @@ const ActionCenter = ({ userData, onUpdate }) => {
                     <Plus size={16} />
                   </div>
                 </div>
-              </motion.div>
+              </motion.button>
             );
           })}
         </AnimatePresence>

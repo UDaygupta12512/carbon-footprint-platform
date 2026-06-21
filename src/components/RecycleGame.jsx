@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { Gamepad2, Trash2, Recycle, Leaf, Coins } from 'lucide-react';
+import { Gamepad2, Trash2, Recycle, Leaf } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const gameItems = [
@@ -14,7 +14,7 @@ const gameItems = [
 ];
 
 const RecycleGame = ({ onAwardTokens }) => {
-  const [items, setItems] = useState([...gameItems].sort(() => Math.random() - 0.5));
+  const [items, setItems] = useState(() => [...gameItems].sort(() => Math.random() - 0.5));
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);

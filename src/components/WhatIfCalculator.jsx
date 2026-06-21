@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, Zap, Car, LeafyGreen, Settings2 } from 'lucide-react';
+import { Calculator, Zap, Car, LeafyGreen, Settings2, TreePine } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, CartesianGrid, LabelList } from 'recharts';
+import { useAppContext } from '../context/AppContext';
 
 const scenarios = [
   { id: 'ev', title: 'Switch to Electric Vehicle', icon: Car, impact: 25 },
@@ -9,7 +10,8 @@ const scenarios = [
   { id: 'vegan', title: 'Adopt a Vegan Diet', icon: LeafyGreen, impact: 20 },
 ];
 
-const WhatIfCalculator = ({ userData }) => {
+const WhatIfCalculator = () => {
+  const { userData } = useAppContext();
   const [activeScenarios, setActiveScenarios] = useState([]);
   const [drivingReduction, setDrivingReduction] = useState(0); // miles
 
@@ -32,6 +34,10 @@ const WhatIfCalculator = ({ userData }) => {
   const drivingSavings = Math.round(drivingReduction * 0.1);
   const totalProjectedSavings = togglesSavings + drivingSavings;
   const projectedScore = Math.max(0, currentScore - totalProjectedSavings);
+
+  // Yearly projection logic: assuming 1 pt = 1 kg CO2/month.
+  const yearlySavingsKg = totalProjectedSavings * 12;
+  const treesEquivalent = Math.round(yearlySavingsKg / 22); // A mature tree absorbs ~22kg of CO2/year
 
   const chartData = [
     { name: 'Current', score: currentScore, color: 'var(--color-danger)' },
@@ -59,10 +65,11 @@ const WhatIfCalculator = ({ userData }) => {
             </h3>
             
             <div className="mb-2 flex justify-between items-end">
-              <label className="font-bold">Reduce Driving (Weekly)</label>
-              <span className="font-black text-primary text-xl">{drivingReduction} mi</span>
+              <label htmlFor="driving-reduction" className="font-bold">Reduce Driving (Weekly)</label>
+              <span className="font-black text-primary text-xl" aria-live="polite">{drivingReduction} mi</span>
             </div>
             <input 
+              id="driving-reduction"
               type="range" 
               min="0" max="200" step="10" 
               value={drivingReduction} 
@@ -92,14 +99,15 @@ const WhatIfCalculator = ({ userData }) => {
               const isActive = activeScenarios.includes(scenario.id);
               const Icon = scenario.icon;
               return (
-                <motion.div
+                <motion.button
                   key={scenario.id}
+                  role="listitem"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 + (idx * 0.1) }}
                   whileHover={{ scale: 1.02 }}
                   onClick={() => toggleScenario(scenario.id)}
-                  className={`p-5 rounded-2xl border cursor-pointer flex items-center justify-between transition-all shadow-sm relative overflow-hidden group ${isActive ? 'bg-primary/10 border-primary' : 'bg-transparent border-gray-200 dark:border-zinc-800 hover:border-primary'}`}
+                  className={`w-full text-left p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all shadow-sm relative overflow-hidden group ${isActive ? 'bg-primary/10 border-primary' : 'bg-transparent border-gray-200 dark:border-zinc-800 hover:border-primary'}`}
                 >
                   {isActive && (
                     <motion.div 
@@ -129,7 +137,7 @@ const WhatIfCalculator = ({ userData }) => {
                       {isActive && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-2 h-2 bg-primary rounded-full" />}
                     </motion.div>
                   </div>
-                </motion.div>
+                </motion.button>
               );
             })}
           </div>
@@ -167,7 +175,12 @@ const WhatIfCalculator = ({ userData }) => {
 
           <div className="mt-8 text-center bg-black/5 dark:bg-white/5 p-6 rounded-2xl">
             {totalProjectedSavings > 0 ? (
-              <p className="font-bold text-lg text-primary m-0">Your actions can make a huge difference.</p>
+              <div className="flex flex-col items-center gap-2">
+                <p className="font-bold text-lg text-primary m-0">Your actions can make a huge difference.</p>
+                <div className="flex items-center gap-2 mt-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-sm font-bold">
+                  <TreePine size={16} /> Over a year, this equals planting ~{treesEquivalent} trees!
+                </div>
+              </div>
             ) : (
               <p className="opacity-60 text-sm font-bold m-0 uppercase tracking-widest">Adjust settings to see projection.</p>
             )}

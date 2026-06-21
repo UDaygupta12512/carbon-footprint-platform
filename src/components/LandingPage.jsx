@@ -2,27 +2,7 @@ import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Leaf, Shield, Users, TrendingDown, PlayCircle } from 'lucide-react';
 
-const FloatingElement = ({ children, delay, duration, yOffset, xOffset, scale = 1, opacity = 0.5 }) => (
-  <motion.div
-    initial={{ y: 0, x: 0, opacity: 0, scale: 0 }}
-    animate={{ 
-      y: [0, yOffset, 0], 
-      x: [0, xOffset, 0], 
-      opacity: [0, opacity, opacity, 0],
-      scale: scale,
-      rotate: [0, 10, -10, 0]
-    }}
-    transition={{ 
-      duration: duration, 
-      repeat: Infinity, 
-      delay: delay,
-      ease: "easeInOut" 
-    }}
-    className="absolute pointer-events-none z-0"
-  >
-    {children}
-  </motion.div>
-);
+
 
 const LandingPage = ({ onStart, onResume, hasData }) => {
   const { scrollY } = useScroll();
@@ -51,10 +31,10 @@ const LandingPage = ({ onStart, onResume, hasData }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight leading-tight"
+          className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight leading-tight"
         >
-          Take Control of Your <br />
-          <span className="text-gradient">Environmental Impact</span>
+          Welcome to the <br />
+          <span className="text-gradient">Carbon Footprint Awareness Platform</span>
         </motion.h1>
         
         <motion.p 

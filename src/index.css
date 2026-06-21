@@ -180,3 +180,16 @@ p { color: var(--color-text); line-height: 1.5; }
 .p-8 { padding: 2rem; }
 .text-center { text-align: center; }
 
+/* Global Animations and Utilities */
+.hide-scrollbar::-webkit-scrollbar { 
+  display: none; 
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
