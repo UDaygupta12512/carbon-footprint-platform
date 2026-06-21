@@ -56,6 +56,10 @@ function App() {
     setAppState,
     setCurrentView,
     toggleTheme,
+    handleStartOnboarding,
+    handleOnboardingComplete,
+    handleUpdateTokens,
+    handleAwardGameTokens,
     handleReset
   } = useAppContext();
 
